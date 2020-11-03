@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: jenkins
+  labels:
+    app: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - name: jenkins
+        image: santhu304/jenkins_jcasc:1.0.0
+        volumeMounts:
+          - name: jenkins-config
+            mountPath: /var/jenkins_home/casc_configs/
+          - name: jenkins-home
+            mountPath: /var/jenkins_home
+          - name: secrets-volume
+            mountPath: "/etc/secrets/"
+            readOnly: true
+        ports:
+          - name: http-port
+            containerPort: 8080
+          - name: jnlp-port
+            containerPort: 50000
+        env:
+          - name: CASC_JENKINS_CONFIG
+            value: /var/jenkins_home/casc_configs/
+          - name: SECRETS
+            value: /etc/secrets/
+      volumes:
+        - name: jenkins-config
+          configMap:
+            name: jenkinsmaster
+        - name: jenkins-home
+          emptyDir: {}
+        - name: secrets-volume
+          secret:
+            secretName: jenkins-secrets

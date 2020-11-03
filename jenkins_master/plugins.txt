@@ -1,0 +1,14 @@
+pipeline-model-definition:1.7.2
+workflow-multibranch:2.22
+github:1.32.0
+kubernetes:1.27.3
+timestamper:1.11.8
+job-dsl:1.77
+pipeline-utility-steps:2.6.1
+ansible:1.0
+ansicolor:0.7.3
+maven-plugin:3.8
+ssh-agent:1.20
+ssh-credentials:1.18.1
+configuration-as-code:1.45
+configuration-as-code-groovy:1.1
