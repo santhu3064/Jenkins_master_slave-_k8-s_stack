@@ -17,7 +17,8 @@ spec:
     spec:
       containers:
       - name: jenkins
-        image: santhu304/jenkins_jcasc:1.0.0
+        image: santhu304/jenkins_jcasc:3.0.0
+        imagePullPolicy: Always
         volumeMounts:
           - name: jenkins-config
             mountPath: /var/jenkins_home/casc_configs/
@@ -36,10 +37,19 @@ spec:
             value: /var/jenkins_home/casc_configs/
           - name: SECRETS
             value: /etc/secrets/
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "50m"
+          limits:
+            memory: "1024Mi"
+            cpu: "2000m"
+      imagePullSecrets:
+        - name: regcred
       volumes:
         - name: jenkins-config
           configMap:
-            name: jenkinsmaster
+              name: jenkinsmaster
         - name: jenkins-home
           emptyDir: {}
         - name: secrets-volume

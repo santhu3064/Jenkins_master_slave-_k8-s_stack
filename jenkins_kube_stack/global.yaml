@@ -11,12 +11,12 @@ jenkins:
         serverUrl: "https://kubernetes.default.svc.cluster.local/"
         skipTlsVerify: true
         namespace: "jenkins"
-        jenkinsUrl: "http://jenkins.jenkins:8080/"
+        jenkinsUrl: "http://172.17.0.2:8080/"
         containerCapStr: 42
         maxRequestsPerHostStr: 64
         retentionTimeout: 5
-        connectTimeout: 10
-        readTimeout: 20
+        connectTimeout: 1000
+        readTimeout: 10000
         templates:
           - name: "mvn"
             namespace: "jenkins"
@@ -24,17 +24,17 @@ jenkins:
             nodeUsageMode: EXCLUSIVE
             containers:
               - name: "jnlp"
-                image: "santhu304/jenkins_mvn_slave"
+                image: "santhu304/jenkins_mvn_slave:1.0.0"
                 alwaysPullImage: true
                 command: ""
                 args: ""
                 workingDir: "workingDir"
                 workingDir: "/home/jenkins"
                 ttyEnabled: true
-                resourceRequestCpu: "500m"
-                resourceLimitCpu: "1000m"
-                resourceRequestMemory: "1Gi"
-                resourceLimitMemory: "2Gi"
+                resourceRequestCpu: "1000m"
+                resourceLimitCpu: "2000m"
+                resourceRequestMemory: "1024Mi"
+                resourceLimitMemory: "2048Mi"
             volumes:
               - emptyDirVolume:
                   memory: false
