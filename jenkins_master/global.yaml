@@ -8,48 +8,75 @@ jenkins:
   clouds:
     - kubernetes:
         name: "advanced-k8s-config"
-        serverUrl: "https://127.0.0.1:32768"
+        serverUrl: "https://kubernetes.default.svc.cluster.local/"
         skipTlsVerify: true
-        namespace: "default"
-        jenkinsUrl: "http://jenkins/"
+        namespace: "jenkins"
+        jenkinsUrl: "http://172.17.0.2:8080/"
         containerCapStr: 42
         maxRequestsPerHostStr: 64
         retentionTimeout: 5
-        connectTimeout: 10
-        readTimeout: 20
+        connectTimeout: 1000
+        readTimeout: 10000
         templates:
-          - name: "test"
-            serviceAccount: "serviceAccount"
-            instanceCap: 1234
-            idleMinutes: 0
-            label: "label"
-            volumes:
-              - hostPathVolume:
-                  mountPath: "mountPath"
-                  hostPath: "hostPath"
-            containers:
-              - name: "name"
-                image: "image"
-                privileged: true
-                alwaysPullImage: true
-                command: "command"
-                args: "args"
-                workingDir: "workingDir"
-                ttyEnabled: true
-                resourceRequestCpu: "resourceRequestCpu"
-                resourceRequestMemory: "resourceRequestMemory"
-                resourceLimitCpu: "resourceLimitCpu"
-                resourceLimitMemory: "resourceLimitMemory"
-            imagePullSecrets:
-              - name: "imagePullSecrets"
-          - name: "k8s-agent"
-            namespace: "default"
-            label: "linux-x86_64"
+          - name: "mvn"
+            namespace: "jenkins"
+            label: "mvn"
             nodeUsageMode: EXCLUSIVE
             containers:
               - name: "jnlp"
-                image: "jenkins/inbound-agent:latest"
+                image: "santhu304/jenkins_mvn_slave:1.0.0"
                 alwaysPullImage: true
+                command: ""
+                args: ""
+                workingDir: "workingDir"
+                workingDir: "/home/jenkins"
+                ttyEnabled: true
+                resourceRequestCpu: "1000m"
+                resourceLimitCpu: "2000m"
+                resourceRequestMemory: "1024Mi"
+                resourceLimitMemory: "2048Mi"
+            volumes:
+              - emptyDirVolume:
+                  memory: false
+                  mountPath: "/tmp"
+            idleMinutes: "1"
+            activeDeadlineSeconds: "120"
+            slaveConnectTimeout: "1000"
+          - name: "ansible"
+            namespace: "jenkins"
+            label: "ansible"
+            nodeUsageMode: EXCLUSIVE
+            containers:
+              - name: "jnlp"
+                image: "santhu304/jenkins_ansible_slave:latest"
+                alwaysPullImage: true
+                command: ""
+                args: ""
+                workingDir: "workingDir"
+                workingDir: "/home/jenkins"
+                ttyEnabled: true
+                resourceRequestCpu: "500m"
+                resourceLimitCpu: "1000m"
+                resourceRequestMemory: "1Gi"
+                resourceLimitMemory: "2Gi"
+            volumes:
+              - emptyDirVolume:
+                  memory: false
+                  mountPath: "/tmp"
+            idleMinutes: "1"
+            activeDeadlineSeconds: "120"
+            slaveConnectTimeout: "1000"
+          - name: "npm"
+            namespace: "jenkins"
+            label: "npm"
+            nodeUsageMode: EXCLUSIVE
+            containers:
+              - name: "jnlp"
+                image: "santhu304/jenkins_npm_slave:1.0.0"
+                alwaysPullImage: true
+                command: ""
+                args: ""
+                workingDir: "workingDir"
                 workingDir: "/home/jenkins"
                 ttyEnabled: true
                 resourceRequestCpu: "500m"
@@ -80,20 +107,6 @@ jenkins:
   remotingSecurity:
     enabled: true
   scmCheckoutRetryCount: 0
-  securityRealm:
-    local:
-      allowsSignup: false
-      enableCaptcha: false
-      users:
-      - id: "admin"
-        name: "admin"
-        properties:
-        - "apiToken"
-        - "mailer"
-        - "myView"
-        - preferredProvider:
-            providerId: "default"
-        - "timezone"
   slaveAgentPort: 50000
   updateCenter:
     sites:
@@ -137,20 +150,14 @@ unclassified:
   location:
     adminAddress: "santhu3064@gmail.com"
     url: "http://127.0.0.1:8000/"
-  mailer:
-    charset: "UTF-8"
-    useSsl: false
-    useTls: false
-  mavenModuleSet:
-    localRepository: "default"
-  pollSCM:
-    pollingThreadCount: 10
-  timestamper:
-    allPipelines: false
-    elapsedTimeFormat: "'<b>'HH:mm:ss.S'</b> '"
-    systemTimeFormat: "'<b>'HH:mm:ss'</b> '"
-tool:
-  git:
-    installations:
-    - home: "git"
-      name: "Default"
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+ # Path to file loaded from Environment Variable
+          - usernamePassword:
+              scope: GLOBAL
+              id: "github_e_name"
+              username: "santhu3064"
+              password: "${GITHUB_PASSWORD}"
+              description: "Username/Password Credentials for some-user"
