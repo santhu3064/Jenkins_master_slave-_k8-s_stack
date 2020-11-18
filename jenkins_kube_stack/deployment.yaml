@@ -51,7 +51,8 @@ spec:
           configMap:
               name: jenkinsmaster
         - name: jenkins-home
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: jenkins-pvc
         - name: secrets-volume
           secret:
             secretName: jenkins-secrets
